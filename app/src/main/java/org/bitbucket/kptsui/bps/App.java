@@ -1,6 +1,7 @@
 package org.bitbucket.kptsui.bps;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import com.parse.Parse;
 
@@ -10,13 +11,22 @@ import com.parse.Parse;
 
 public class App extends Application {
     public final static String TAG = "BPS";
-    private static App instance;
+    public final static String PREFS_KEY = "BPS_USER";
+    public final static String PREFS_USER_NAME_KEY = "name";
+    public final static String PREFS_USER_PW_KEY = "pw";
 
+    private static App instance;
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+        this.sharedPreferences = getSharedPreferences(PREFS_KEY, 0);
+        User user = User.getInstance();
+        user.setName(sharedPreferences.getString(PREFS_USER_NAME_KEY, null));
+        user.setPw(sharedPreferences.getString(PREFS_USER_PW_KEY, null));
 
         Parse.initialize(new Parse.Configuration.Builder(getApplicationContext())
                 .applicationId("RAYW2_BPS")
@@ -27,5 +37,9 @@ public class App extends Application {
 
     public static App getInstance(){
         return instance;
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return sharedPreferences;
     }
 }

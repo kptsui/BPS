@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == itemHome){
 
         }else if (view == itemProfile){
+            if(User.getInstance().isLogged())
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 
         }else if (view == itemCalendar){
 

@@ -34,5 +34,6 @@ dependencies {
     compile 'com.estimote:sdk:0.13.0@aar'
     compile 'com.parse:parse-android:1.13.1'
     compile 'com.specyci:residemenu:1.6+'
+    compile 'info.hoang8f:android-segmented:1.0.6'
     testCompile 'junit:junit:4.12'
 }
