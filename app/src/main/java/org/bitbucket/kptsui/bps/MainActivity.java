@@ -21,7 +21,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private final static String CAR_PARK_ID = "f1tMOZIDmZ";
 
-    private TextView availableSpace;
+    private TextView availableSpaces;
+    private TextView totalSpaces;
+    private TextView carParkName;
+    private TextView carParkAddress;
 
     private ResideMenu resideMenu;
     private ResideMenuItem itemHome;
@@ -35,13 +38,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.menu);
+
         setUpSideMenu();
 
-        availableSpace = (TextView) findViewById(R.id.availableSpace);
+        availableSpaces = (TextView) findViewById(R.id.availableSpaces);
+        totalSpaces = (TextView) findViewById(R.id.totalSpaces);
+        carParkName = (TextView) findViewById(R.id.carParkName);
+        carParkAddress = (TextView) findViewById(R.id.carParkAddress);
 
         updateParkingSpaces();
     }
@@ -51,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resideMenu.setBackground(R.drawable.menu_background);
         resideMenu.attachToActivity(this);
 
-        resideMenu.setScaleValue(0.5f);
+        //resideMenu.setScaleValue(0.5f);
         //resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
 
         // create menu items;
@@ -111,9 +119,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         query.getInBackground(CAR_PARK_ID, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
-                    Log.d(App.TAG, "Fetch object: " + object);
-                    int availableSpace = object.getInt("availableSpace");
-                    MainActivity.this.availableSpace.setText(String.valueOf(availableSpace));
+                    Log.d(App.TAG, "Fetched object: " + object);
+
+                    int availableSpaces = object.getInt("availableSpace");
+                    MainActivity.this.availableSpaces.setText(String.valueOf(availableSpaces));
+
+                    int totalSpaces = object.getInt("totalAvailableSpace");
+                    MainActivity.this.totalSpaces.setText(String.valueOf(totalSpaces));
+
+                    MainActivity.this.carParkName.setText(object.getString("name"));
+                    MainActivity.this.carParkAddress.setText(object.getString("address"));
                 } else {
                     // something went wrong
                     Log.e(App.TAG, e.toString());
@@ -122,12 +137,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void toNavigationActivity(){
+    public void findMyCar(View v){
         Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
         startActivity(intent);
     }
 
-    public void onNavigationClick(View v){
-        toNavigationActivity();
+    public void parkMyCar(View v){
+        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+        startActivity(intent);
     }
 }

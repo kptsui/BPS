@@ -35,5 +35,6 @@ dependencies {
     compile 'com.parse:parse-android:1.13.1'
     compile 'com.specyci:residemenu:1.6+'
     compile 'info.hoang8f:android-segmented:1.0.6'
+    compile 'com.paypal.sdk:paypal-android-sdk:2.15.1'
     testCompile 'junit:junit:4.12'
 }

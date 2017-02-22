@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -8,14 +8,102 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     android:background="@drawable/cover_page"
     tools:context="org.bitbucket.kptsui.bps.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/availableSpace"
-        android:onClick="onNavigationClick"
-        android:textSize="32sp" />
-</RelativeLayout>
+        android:background="@color/black_overlay">
+
+        <TextView
+            android:id="@+id/carParkName"
+            android:text="Car Park"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="22sp"
+            android:textColor="#BFFFFFFF" />
+
+        <TextView
+            android:id="@+id/carParkAddress"
+            android:text="HKUST Clear Water Bay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:text="Available Parking Spaces"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="22sp"
+            android:textColor="#BFFFFFFF" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center">
+
+            <TextView
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/availableSpaces"
+                android:textSize="32sp"/>
+
+            <TextView
+                android:text=" / "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="32sp"/>
+
+            <TextView
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/totalSpaces"
+                android:textSize="32sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="50dp"
+        android:gravity="bottom">
+
+        <Button
+            android:text="Find My Car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnFindMyCar"
+            android:drawableTop="@mipmap/ic_launcher"
+            android:textAllCaps="false"
+            android:onClick="findMyCar"
+            android:layout_weight="1" />
+
+        <Button
+            android:text="Park My Car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnParkMyCar"
+            android:drawableTop="@mipmap/ic_launcher"
+            android:textAllCaps="false"
+            android:onClick="parkMyCar"
+            android:layout_weight="1" />
+    </LinearLayout>
+</LinearLayout>

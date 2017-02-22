@@ -33,5 +33,5 @@
         android:text="Arrived"
         android:textAllCaps="false"
         android:textSize="28sp"
-        android:background="@color/abc_search_url_text_normal" />
+        android:background="@color/colorAccent" />
 </LinearLayout>

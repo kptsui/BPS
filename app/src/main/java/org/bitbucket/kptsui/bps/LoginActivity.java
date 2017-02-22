@@ -1,6 +1,7 @@
 package org.bitbucket.kptsui.bps;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,8 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import info.hoang8f.android.segmented.SegmentedGroup;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,6 +36,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        SegmentedGroup segmented = (SegmentedGroup) findViewById(R.id.segmentedGroup);
+        segmented.setTintColor(getResources().getColor(R.color.colorAccent));
 
         loginName = (EditText) findViewById(R.id.loginName);
         loginPw = (EditText) findViewById(R.id.loginPw);
