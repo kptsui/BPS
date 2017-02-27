@@ -138,8 +138,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void findMyCar(View v){
-        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
-        startActivity(intent);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
+
+        query.whereEqualTo("currentUser", User.getInstance().getId());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    Log.d(App.TAG, "Fetched object: " + object);
+                    String parkingLotId = "";
+                    if(object != null){ // user parked before
+                        parkingLotId = object.getString("parkingLotId");
+
+                    }
+                    Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+                    intent.putExtra("parkingLotId", parkingLotId);
+                    startActivity(intent);
+                } else {
+                    // something went wrong
+                    Log.e(App.TAG, e.toString());
+                }
+            }
+        });
     }
 
     public void parkMyCar(View v){

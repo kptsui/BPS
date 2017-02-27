@@ -70,6 +70,9 @@ public class NavigationActivity extends AppCompatActivity {
         //mWebView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);
         webView.loadUrl("file:///android_asset/index.html");
 
+        // TODO:
+        String parkingLotId = getIntent().getStringExtra("parkingLotId");
+
         // Sandbox for test, Production for real
         paypal_config = new PayPalConfiguration()
                 .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
