@@ -88,15 +88,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void btnLoginSend(View v){
-        final String name = loginName.getText().toString();
-        final String pw = loginPw.getText().toString();
+        login(loginName.getText().toString(), loginPw.getText().toString());
+    }
 
+    private void login(final String name, final String pw){
         ParseUser.logInInBackground(name, pw, new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
                 if (user != null) {
                     // Hooray! The user is logged in.
-                    User.getInstance().save(name, pw);
                     Toast.makeText(App.getInstance(), "Login succeed", Toast.LENGTH_SHORT).show();
+
+                    User.getInstance().save(user.getObjectId(), name, pw);
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 } else {
@@ -109,10 +111,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void btnSignUpSend(View v){
-        final String name = signUpName.getText().toString();
-        final String pw = signUpPw.getText().toString();
-        final String email = signUpEmail.getText().toString();
+        signUp(signUpName.getText().toString(),
+                signUpPw.getText().toString(),
+                signUpEmail.getText().toString());
+    }
 
+    private void signUp(final String name, final String pw, final String email){
         ParseUser user = new ParseUser();
         user.setUsername(name);
         user.setPassword(pw);
@@ -126,10 +130,8 @@ public class LoginActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e == null) {
                     // Hooray! Let them use the app now.
-                    User.getInstance().save(name, pw);
                     Toast.makeText(App.getInstance(), "Sign up succeed", Toast.LENGTH_SHORT).show();
-
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    login(name, pw);
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong

@@ -12,26 +12,31 @@ public class User {
 
     private String name;
     private String pw;
+    private String id;
 
     private User() {
 
     }
 
-    public void save(String name, String pw){
+    public void save(String id, String name, String pw){
+        this.id = id;
         this.name = name;
         this.pw = pw;
         App.getInstance().getSharedPreferences()
                 .edit()
+                .putString(App.PREFS_USER_ID_KEY, id)
                 .putString(App.PREFS_USER_NAME_KEY, name)
                 .putString(App.PREFS_USER_PW_KEY, pw)
                 .apply();
     }
 
     public void clean(){
+        this.id = null;
         this.name = null;
         this.pw = null;
         App.getInstance().getSharedPreferences()
                 .edit()
+                .putString(App.PREFS_USER_ID_KEY, id)
                 .putString(App.PREFS_USER_NAME_KEY, name)
                 .putString(App.PREFS_USER_PW_KEY, pw)
                 .apply();
@@ -39,6 +44,15 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+
     }
 
     public String getPw() {
@@ -54,6 +68,11 @@ public class User {
     }
 
     public boolean isLogged(){
-        return name != null && pw != null & !name.isEmpty() && !pw.isEmpty();
+        return id != null
+                && name != null
+                && pw != null
+                && !id.isEmpty()
+                && !name.isEmpty()
+                && !pw.isEmpty();
     }
 }

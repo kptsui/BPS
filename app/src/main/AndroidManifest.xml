@@ -18,15 +18,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
+
         </activity>
 
         <activity
             android:name=".NavigationActivity"
             android:label="Navigation"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -35,6 +37,8 @@
 
         <activity
             android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
             android:label="Login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,6 +48,7 @@
 
         <activity
             android:name=".ProfileActivity"
+            android:screenOrientation="portrait"
             android:label="Profile"
             android:parentActivityName=".MainActivity">
             <meta-data

@@ -1,0 +1,10 @@
+/* Make sure the map container has a defined height */
+#mapid {
+	height: 401px;
+	width: 312px;
+	margin: 0 auto;
+}
+
+body{
+    background-color: gray;
+}
