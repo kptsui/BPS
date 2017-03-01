@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -27,9 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView carParkAddress;
 
     private ResideMenu resideMenu;
-    private ResideMenuItem itemHome;
     private ResideMenuItem itemProfile;
-    private ResideMenuItem itemCalendar;
     private ResideMenuItem itemSettings;
 
     private ActionBar actionBar;
@@ -63,19 +62,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
 
         // create menu items;
-        itemHome     = new ResideMenuItem(this, R.drawable.abc_btn_check_material,     "Home");
-        itemProfile  = new ResideMenuItem(this, R.drawable.abc_btn_check_material,  "Profile");
-        itemCalendar = new ResideMenuItem(this, R.drawable.abc_btn_check_material, "Calendar");
-        itemSettings = new ResideMenuItem(this, R.drawable.abc_btn_check_material, "Settings");
+        itemProfile  = new ResideMenuItem(this, R.drawable.ic_profile,  "Profile");
+        itemSettings = new ResideMenuItem(this, R.drawable.ic_setting, "Settings");
 
-        resideMenu.addMenuItem(itemHome, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemProfile, ResideMenu.DIRECTION_LEFT);
-        resideMenu.addMenuItem(itemCalendar, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemSettings, ResideMenu.DIRECTION_LEFT);
 
-        itemHome.setOnClickListener(this);
         itemProfile.setOnClickListener(this);
-        itemCalendar.setOnClickListener(this);
         itemSettings.setOnClickListener(this);
     }
 
@@ -99,13 +92,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
 
-        if (view == itemHome){
-
-        }else if (view == itemProfile){
+        if (view == itemProfile){
             if(User.getInstance().isLogged())
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-
-        }else if (view == itemCalendar){
 
         }else if (view == itemSettings){
 
@@ -140,23 +129,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void findMyCar(View v){
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
 
+        Log.d(App.TAG, "ParkingSpace user id: " + User.getInstance().getId());
+
         query.whereEqualTo("currentUser", User.getInstance().getId());
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                if (e == null) {
+                if (e == null && object != null) { // user parked before
                     Log.d(App.TAG, "Fetched object: " + object);
-                    String parkingLotId = "";
-                    if(object != null){ // user parked before
-                        parkingLotId = object.getString("parkingLotId");
+                    String parkingLotId = object.getString("parkingLotId");
 
-                    }
                     Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
                     intent.putExtra("parkingLotId", parkingLotId);
                     startActivity(intent);
                 } else {
                     // something went wrong
-                    Log.e(App.TAG, e.toString());
+                    Log.e(App.TAG, e.getMessage());
+                    Toast.makeText(App.getInstance(), "You did not park a car", Toast.LENGTH_SHORT).show();
                 }
             }
         });
