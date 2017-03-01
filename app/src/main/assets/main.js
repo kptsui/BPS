@@ -23,6 +23,8 @@ $(document).ready(function(){
 	// add image to map
 	var image = L.imageOverlay('img/floor_plan.png', bounds).addTo(map);
 	map.fitBounds(bounds);
+	// center the view in y, x : 200, 156, zoom = 1
+	map.setView( [200, 156], 1);
 
 	// set marker
 	//marker = L.marker([371, 178], {icon: markerIcon});
