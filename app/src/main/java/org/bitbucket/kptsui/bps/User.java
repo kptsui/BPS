@@ -13,20 +13,23 @@ public class User {
     private String name;
     private String pw;
     private String id;
+    private String email;
 
     private User() {
 
     }
 
-    public void save(String id, String name, String pw){
+    public void save(String email, String id, String name, String pw){
         this.id = id;
         this.name = name;
         this.pw = pw;
+        this.email = email;
         App.getInstance().getSharedPreferences()
                 .edit()
                 .putString(App.PREFS_USER_ID_KEY, id)
                 .putString(App.PREFS_USER_NAME_KEY, name)
                 .putString(App.PREFS_USER_PW_KEY, pw)
+                .putString(App.PREFS_USER_EMAIL_KEY, email)
                 .apply();
     }
 
@@ -34,11 +37,13 @@ public class User {
         this.id = null;
         this.name = null;
         this.pw = null;
+        this.email = null;
         App.getInstance().getSharedPreferences()
                 .edit()
                 .putString(App.PREFS_USER_ID_KEY, id)
                 .putString(App.PREFS_USER_NAME_KEY, name)
                 .putString(App.PREFS_USER_PW_KEY, pw)
+                .putString(App.PREFS_USER_EMAIL_KEY, email)
                 .apply();
     }
 
@@ -57,6 +62,14 @@ public class User {
 
     public String getPw() {
         return pw;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setName(String name) {

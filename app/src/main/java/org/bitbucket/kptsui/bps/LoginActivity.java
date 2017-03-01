@@ -97,8 +97,12 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     // Hooray! The user is logged in.
                     Toast.makeText(App.getInstance(), "Login succeed", Toast.LENGTH_SHORT).show();
-
-                    User.getInstance().save(user.getObjectId(), name, pw);
+                    // user.getEmail() must check null, because it may be null
+                    User.getInstance().save(
+                            user.getEmail() == null ? "-----" : user.getEmail(),
+                            user.getObjectId(),
+                            name,
+                            pw);
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 } else {

@@ -37,6 +37,7 @@ public class App extends Application {
     public final static String PREFS_USER_ID_KEY = "id";
     public final static String PREFS_USER_NAME_KEY = "name";
     public final static String PREFS_USER_PW_KEY = "pw";
+    public final static String PREFS_USER_EMAIL_KEY = "email";
 
     private static App instance;
     private SharedPreferences sharedPreferences;
@@ -121,6 +122,7 @@ public class App extends Application {
         user.setId(sharedPreferences.getString(PREFS_USER_ID_KEY, null));
         user.setName(sharedPreferences.getString(PREFS_USER_NAME_KEY, null));
         user.setPw(sharedPreferences.getString(PREFS_USER_PW_KEY, null));
+        user.setEmail(sharedPreferences.getString(PREFS_USER_EMAIL_KEY, null));
 
         Parse.initialize(new Parse.Configuration.Builder(getApplicationContext())
                 .applicationId("RAYW2_BPS")
