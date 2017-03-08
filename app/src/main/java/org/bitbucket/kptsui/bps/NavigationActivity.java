@@ -104,6 +104,16 @@ public class NavigationActivity extends AppCompatActivity {
                 try {
                     if(beacons == null || beacons.size() == 0){
                         Log.d(App.TAG, "no Beacons found");
+                        final StringBuilder invoke = new StringBuilder();
+                        invoke.append("javascript:updateMarker('p55','")
+                                .append("[{\"bid\":2,\"rssi\":-50}]")
+                                .append("');");
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                webView.loadUrl(invoke.toString());
+                            }
+                        });
                         return;
                     }
 
@@ -119,7 +129,7 @@ public class NavigationActivity extends AppCompatActivity {
                     }
 
                     final StringBuilder invoke = new StringBuilder();
-                    invoke.append("javascript:updateMarker('")
+                    invoke.append("javascript:updateMarker('p55','")
                             .append(jsonArray.toString())
                             .append("');");
 
