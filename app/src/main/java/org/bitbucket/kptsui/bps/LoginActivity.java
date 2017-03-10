@@ -84,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if(User.getInstance().isLogged()){
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         }
     }
 
@@ -105,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                             pw);
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
                 } else {
                     // Signup failed. Look at the ParseException to see what happened.
                     Toast.makeText(App.getInstance(), "Login failed", Toast.LENGTH_SHORT).show();
