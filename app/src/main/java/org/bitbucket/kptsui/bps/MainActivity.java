@@ -1,5 +1,6 @@
 package org.bitbucket.kptsui.bps;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,12 +12,26 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -32,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ResideMenuItem itemSettings;
 
     private ActionBar actionBar;
+
+    private RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         totalSpaces = (TextView) findViewById(R.id.totalSpaces);
         carParkName = (TextView) findViewById(R.id.carParkName);
         carParkAddress = (TextView) findViewById(R.id.carParkAddress);
+
+        requestQueue = Volley.newRequestQueue(this);
 
         updateParkingSpaces();
     }
@@ -93,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
 
         if (view == itemProfile){
-            if(User.getInstance().isLogged())
+            if(ParseUser.getCurrentUser() != null)
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
 
         }else if (view == itemSettings){
@@ -127,20 +146,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void findMyCar(View v){
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Finding Your Car Lot");
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
 
-        Log.d(App.TAG, "ParkingSpace user id: " + User.getInstance().getId());
-
-        query.whereEqualTo("currentUser", User.getInstance().getId());
+        query.whereEqualTo("currentUser", ParseUser.getCurrentUser().getObjectId());
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
+                progressDialog.dismiss();
+
                 if (e == null && object != null) { // user parked before
                     Log.d(App.TAG, "Fetched object: " + object);
                     String parkingLotId = object.getString("parkingLotId");
 
                     Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
                     intent.putExtra("parkingLotId", parkingLotId);
+                    intent.putExtra("isDirectedGraph", 0);
                     startActivity(intent);
                 } else {
                     // something went wrong
@@ -152,7 +178,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void parkMyCar(View v){
-        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
-        startActivity(intent);
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Getting Car Lot");
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+
+        StringRequest request = new StringRequest(Request.Method.POST, "http://opw0011.ddns.net:1337/parse/functions/checkin",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d(App.TAG, response);
+
+                            Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+                            intent.putExtra("isDirectedGraph", 1);
+                            startActivity(intent);
+
+                        } catch (Exception e){
+                            Log.e(App.TAG, e.getMessage());
+                            Toast.makeText(App.getInstance(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            progressDialog.dismiss();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Log.e(App.TAG, error.getMessage());
+                        Toast.makeText(App.getInstance(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<>();
+                params.put("X-Parse-Application-Id", "RAYW2_BPS");
+                params.put("X-Parse-REST-API-Key", "291fa14b5f8dc421c65f53ab9886edce");
+                params.put("X-Parse-Session-Token", "");
+
+                return params;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return super.getParams();
+            }
+        };
+        requestQueue.add(request);
     }
 }

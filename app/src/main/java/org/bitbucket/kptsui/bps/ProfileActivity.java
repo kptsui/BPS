@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView userId, userName, userEmail;
@@ -18,14 +20,14 @@ public class ProfileActivity extends AppCompatActivity {
         userName = (TextView) findViewById(R.id.userName);
         userEmail = (TextView) findViewById(R.id.userEmail);
 
-        User user = User.getInstance();
-        userId.setText(user.getId());
-        userName.setText(user.getName());
+        ParseUser user = ParseUser.getCurrentUser();
+        userId.setText(user.getObjectId());
+        userName.setText(user.getUsername());
         userEmail.setText(user.getEmail());
     }
 
     public void btnLogoutClicked(View v){
-        User.getInstance().clean();
+        ParseUser.logOut();
 
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

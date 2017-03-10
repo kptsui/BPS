@@ -1,7 +1,7 @@
 package org.bitbucket.kptsui.bps;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -82,7 +82,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        if(User.getInstance().isLogged()){
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
@@ -93,17 +94,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(final String name, final String pw){
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Logging In");
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+
         ParseUser.logInInBackground(name, pw, new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
+                progressDialog.dismiss();
+
                 if (user != null) {
                     // Hooray! The user is logged in.
                     Toast.makeText(App.getInstance(), "Login succeed", Toast.LENGTH_SHORT).show();
-                    // user.getEmail() must check null, because it may be null
-                    User.getInstance().save(
-                            user.getEmail() == null ? "-----" : user.getEmail(),
-                            user.getObjectId(),
-                            name,
-                            pw);
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
@@ -123,6 +126,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signUp(final String name, final String pw, final String email){
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Signing Up");
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+
         ParseUser user = new ParseUser();
         user.setUsername(name);
         user.setPassword(pw);
@@ -134,6 +143,8 @@ public class LoginActivity extends AppCompatActivity {
 
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
+                progressDialog.dismiss();
+
                 if (e == null) {
                     // Hooray! Let them use the app now.
                     Toast.makeText(App.getInstance(), "Sign up succeed", Toast.LENGTH_SHORT).show();

@@ -21,6 +21,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
@@ -58,6 +59,8 @@ public class NavigationActivity extends AppCompatActivity {
     Intent service;
 
     private WebView webView;
+    private int isDirectedGraph;
+    private String parkingLotId = "p55";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,8 @@ public class NavigationActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/index.html");
 
         // TODO:
-        String parkingLotId = getIntent().getStringExtra("parkingLotId");
+        parkingLotId = getIntent().getStringExtra("parkingLotId");
+        isDirectedGraph = getIntent().getIntExtra("isDirectedGraph", 0);
 
         // Sandbox for test, Production for real
         paypal_config = new PayPalConfiguration()
@@ -118,17 +122,16 @@ public class NavigationActivity extends AppCompatActivity {
                         jsonArray.put(jsonObject);
                     }
 
-                    final StringBuilder invoke = new StringBuilder();
-                    invoke.append("javascript:updateMarker('p55','")
-                            .append(jsonArray.toString())
-                            .append("');");
+                    final String invoke =
+                            "javascript:updateMarker(" + isDirectedGraph + ",'p55','"
+                            + jsonArray.toString() + "');";
 
-                    Log.d(App.TAG, invoke.toString());
+                    Log.d(App.TAG, invoke);
 
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            webView.loadUrl(invoke.toString());
+                            webView.loadUrl(invoke);
                         }
                     });
 
@@ -184,7 +187,7 @@ public class NavigationActivity extends AppCompatActivity {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
 
         query.whereEqualTo("status", "checkedOut");
-        query.whereEqualTo("user", User.getInstance().getId());
+        query.whereEqualTo("user", ParseUser.getCurrentUser().getObjectId());
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {

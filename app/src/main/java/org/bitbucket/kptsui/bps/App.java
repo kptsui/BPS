@@ -17,6 +17,7 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,12 +35,9 @@ public class App extends Application {
     public final static int BEACON_EXIT_MAJOR_ID = 99;
 
     public final static String PREFS_KEY = "BPS_USER";
-    public final static String PREFS_USER_ID_KEY = "id";
-    public final static String PREFS_USER_NAME_KEY = "name";
-    public final static String PREFS_USER_PW_KEY = "pw";
-    public final static String PREFS_USER_EMAIL_KEY = "email";
 
     private static App instance;
+
     private SharedPreferences sharedPreferences;
     private BeaconManager beaconManager;
 
@@ -51,12 +49,12 @@ public class App extends Application {
         beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
             @Override
             public void onEnteredRegion(Region region, List<Beacon> list) {
-                if(User.getInstance().isLogged()
+                if(ParseUser.getCurrentUser() != null
                     &&region.getMinor() == BEACON_ENTER_EXIT_COMMON_MINOR_ID){
 
                     ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
 
-                    query.whereEqualTo("currentUser", User.getInstance().getId());
+                    query.whereEqualTo("user", ParseUser.getCurrentUser().getObjectId());
                     query.getFirstInBackground(new GetCallback<ParseObject>() {
                                 @Override
                                 public void done(ParseObject object, ParseException e) {
@@ -79,13 +77,13 @@ public class App extends Application {
 
             @Override
             public void onExitedRegion(Region region) {
-                if(User.getInstance().isLogged()
+                if(ParseUser.getCurrentUser() != null
                         && region.getMinor() == BEACON_ENTER_EXIT_COMMON_MINOR_ID
                         && region.getMajor() == BEACON_EXIT_MAJOR_ID){
 
                     ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
 
-                    query.whereEqualTo("currentUser", User.getInstance().getId());
+                    query.whereEqualTo("user", ParseUser.getCurrentUser().getObjectId());
                     query.getFirstInBackground(new GetCallback<ParseObject>() {
                                 @Override
                                 public void done(ParseObject object, ParseException e) {
@@ -118,11 +116,6 @@ public class App extends Application {
         instance = this;
 
         this.sharedPreferences = getSharedPreferences(PREFS_KEY, 0);
-        User user = User.getInstance();
-        user.setId(sharedPreferences.getString(PREFS_USER_ID_KEY, null));
-        user.setName(sharedPreferences.getString(PREFS_USER_NAME_KEY, null));
-        user.setPw(sharedPreferences.getString(PREFS_USER_PW_KEY, null));
-        user.setEmail(sharedPreferences.getString(PREFS_USER_EMAIL_KEY, null));
 
         Parse.initialize(new Parse.Configuration.Builder(getApplicationContext())
                 .applicationId("RAYW2_BPS")
