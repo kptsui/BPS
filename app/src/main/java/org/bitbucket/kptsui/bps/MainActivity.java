@@ -1,5 +1,6 @@
 package org.bitbucket.kptsui.bps;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -25,11 +26,19 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +59,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private RequestQueue requestQueue;
 
+    // Paypal variable
+    public final static int PAYPAL_REQUEST_CODE = 999;
+    // Test pay 10 dollars
+    private int hourlyRate = 40;
+    // payment to this account
+    public final static String paypal_client_id = "ASnyoDP9KsZ8yVdYCrRaSddOpMQ1utYPHE0GvbkdnD50eAihws3yspNgaMsuhDdw4P5rlsaduNodNszN";
+
+    PayPalConfiguration paypal_config;
+    Intent service;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +87,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         carParkAddress = (TextView) findViewById(R.id.carParkAddress);
 
         requestQueue = Volley.newRequestQueue(this);
+
+        //PayPal
+        // Sandbox for test, Production for real
+        paypal_config = new PayPalConfiguration()
+                .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+                .clientId(paypal_client_id);
+
+        service = new Intent(this, PayPalService.class);
+        service.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, paypal_config);
+        startService(service); // listening
 
         updateParkingSpaces();
     }
@@ -129,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (e == null) {
                     Log.d(App.TAG, "Fetched object: " + object);
 
+                    MainActivity.this.hourlyRate = object.getInt("hourlyRate");
+
                     int availableSpaces = object.getInt("availableSpace");
                     MainActivity.this.availableSpaces.setText(String.valueOf(availableSpaces));
 
@@ -178,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void parkMyCar(View v){
-        final ProgressDialog progressDialog = new ProgressDialog(this);
+        /*final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Getting Car Lot");
         progressDialog.setMessage("Please Wait...");
@@ -216,16 +247,138 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Map<String, String>  params = new HashMap<>();
                 params.put("X-Parse-Application-Id", "RAYW2_BPS");
                 params.put("X-Parse-REST-API-Key", "291fa14b5f8dc421c65f53ab9886edce");
-                params.put("X-Parse-Session-Token", "");
-
+                params.put("X-Parse-Session-Token", ParseUser.getCurrentUser().getSessionToken());
                 return params;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                return super.getParams();
+            public byte[] getBody() throws AuthFailureError {
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("time", 5);
+                    return json.toString().getBytes();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return "{}".getBytes();
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
             }
         };
         requestQueue.add(request);
+        */
+
+        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+        intent.putExtra("isDirectedGraph", 1);
+        startActivity(intent);
+    }
+
+    public void checkout(){
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Checking out");
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.show();
+
+        StringRequest request = new StringRequest(Request.Method.POST, "http://opw0011.ddns.net:1337/parse/functions/checkout",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Toast.makeText(App.getInstance(), "Check-out successfully", Toast.LENGTH_SHORT).show();
+                            Log.d(App.TAG, response);
+
+                        } catch (Exception e){
+                            Log.e(App.TAG, e.getMessage());
+                            Toast.makeText(App.getInstance(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            progressDialog.dismiss();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Log.e(App.TAG, error.getMessage());
+                        Toast.makeText(App.getInstance(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<>();
+                params.put("X-Parse-Application-Id", "RAYW2_BPS");
+                params.put("X-Parse-REST-API-Key", "291fa14b5f8dc421c65f53ab9886edce");
+                params.put("X-Parse-Session-Token", ParseUser.getCurrentUser().getSessionToken());
+                return params;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    private void pay(){
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
+
+        query.whereEqualTo("status", "checkedIn");
+        query.whereEqualTo("user", ParseUser.getCurrentUser().getObjectId());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    Log.d(App.TAG, "Fetched object: " + object);
+                    if(object != null){ // user parked before
+                        Date checkIn = object.getDate("checkinTime");
+                        Date checkOut = object.getDate("checkoutTime");
+                        long parkedHours = (checkOut.getTime() - checkIn.getTime()) / (60*60*1000);
+
+                        PayPalPayment payment = new PayPalPayment(new BigDecimal(parkedHours * hourlyRate), "HKD", parkedHours + " hr(s) Car Park Payment",
+                                PayPalPayment.PAYMENT_INTENT_SALE);
+                        // go to PaymentActivity
+                        Intent intent = new Intent(MainActivity.this, PaymentActivity.class);
+                        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, paypal_config);
+                        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+
+                        startActivityForResult(intent, PAYPAL_REQUEST_CODE);
+                    }
+                } else {
+                    // something went wrong
+                    Log.e(App.TAG, e.toString());
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PAYPAL_REQUEST_CODE){
+            if(resultCode == Activity.RESULT_OK){
+                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+
+                if(confirm != null){
+                    String state = confirm.getProofOfPayment().getState();
+                    if(state.equals("approved")){
+                        Toast.makeText(this, "Payment is approved", Toast.LENGTH_SHORT).show();
+                        Log.d(App.TAG, "Payment is approved");
+
+                        // Server data check out here
+                        checkout();
+                    }
+                    else {
+                        Toast.makeText(this, "Payment error: " + state, Toast.LENGTH_SHORT).show();
+                        Log.e(App.TAG, "Payment error: " + state);
+                    }
+                }
+                else {
+                    Toast.makeText(this, "Confirmation is null", Toast.LENGTH_SHORT).show();
+                    Log.e(App.TAG, "Confirmation is null");
+                }
+            }
+        }
     }
 }

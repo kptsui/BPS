@@ -47,7 +47,8 @@ $(document).ready(function(){
   /*
   Testing
   */
-
+	//test1();
+	//test2();
 /*
 	setTimeout(function(){
 		var moving_path_order = graph.findShortestPath('p1', 'p1');
@@ -73,8 +74,6 @@ $(document).ready(function(){
 	}, 600);
 */
 
-	//test1();
-	//test2();
 });
 
 function link(path_order){
@@ -141,7 +140,7 @@ input object array = [
 {bid: 5, rssi: -99}
 ];
 */
-function updateMarker(isDirectedGraph, destination, arr){ // arr must be json array string
+function updateMarker(showMyPointOnly, isDirectedGraph, destination, arr){ // arr must be json array string
   var jsonArray = JSON.parse(arr);
   if(jsonArray.length == 0){
     console.log("Empty array");
@@ -170,7 +169,6 @@ function updateMarker(isDirectedGraph, destination, arr){ // arr must be json ar
 	// update position with moving marker animation
 	// first point received
 	if(previousPoint == null && currentPoint != null){
-		// Update the path
 		var path_order = graph.findShortestPath('p' + currentPoint.bid, destination); // ['a', 'c', 'b']
 		if(path_order == null){
 			currentPoint = previousPoint; // roll back
@@ -178,15 +176,17 @@ function updateMarker(isDirectedGraph, destination, arr){ // arr must be json ar
 			console.log("------------------------------");
 			return;
 		}
-		console.log(path_order);
-		var linked_points = link(path_order);
 
+		// print the path
 		removePath();
-		polyLine = L.polyline(linked_points.coordinates, {color: 'yellow'}).addTo(map);
+		if(showMyPointOnly == 0){
+			console.log(path_order);
+			var linked_points = link(path_order);
+			polyLine = L.polyline(linked_points.coordinates, {color: 'yellow'}).addTo(map);
+		}
 
 		// print static marker
 		removeMaker();
-
 		movingMarker = L.Marker
 		.movingMarker(
 			[[currentPoint.y, currentPoint.x]],
@@ -194,8 +194,7 @@ function updateMarker(isDirectedGraph, destination, arr){ // arr must be json ar
 			{icon: markerIcon}
 		).addTo(map);
 	}
-	else if(previousPoint != null
-		&& currentPoint != null
+	else if(previousPoint != null && currentPoint != null
 		&& previousPoint.bid != currentPoint.bid){
 			var path_order = graph.findShortestPath('p' + currentPoint.bid, destination); // ['a', 'c', 'b']
 			console.log("path_order: ");
@@ -225,25 +224,38 @@ function updateMarker(isDirectedGraph, destination, arr){ // arr must be json ar
 			console.log("MovingMarker.start");
 
 			// Update the path
-		  var linked_points = link(path_order);
-
 			removePath();
-			polyLine = L.polyline(linked_points.coordinates, {color: 'yellow'}).addTo(map);
+			if(showMyPointOnly == 0){
+				var linked_points = link(path_order);
+				polyLine = L.polyline(linked_points.coordinates, {color: 'yellow'}).addTo(map);
+			}
 	}
-	// re-print the marker
-	/*marker = L.marker([currentPoint.y, currentPoint.x], {icon: markerIcon});
-  marker.addTo(map).bindPopup('You are around here!'); // y, x in pixel
-  console.log("print marker");*/
+	else if(previousPoint != null && currentPoint != null
+		&& previousPoint.bid == currentPoint.bid){ // at same point
+			removePath();
+			if(showMyPointOnly == 0){
+				var path_order = graph.findShortestPath('p' + currentPoint.bid, destination); // ['a', 'c', 'b']
+				console.log("path_order: ");
+				console.log(path_order);
 
+				if(path_order == null){
+					currentPoint = previousPoint; // roll back
+					console.log("invalid path");
+					console.log("------------------------------");
+					return;
+				}
+
+				var linked_points = link(path_order);
+				polyLine = L.polyline(linked_points.coordinates, {color: 'yellow'}).addTo(map);
+			}
+		}
   console.log("------------------------------");
-
-	// center the view according to the marker
-	// map.setView( [y, x], 1);
 }
 
 function removeMaker(){
 	if(movingMarker != null){
 		map.removeLayer(movingMarker);
+		movingMarker = null;
 		console.log("remove previous marker");
 	}
 }
@@ -251,6 +263,7 @@ function removeMaker(){
 function removePath(){
 	if(polyLine != null){
 		 map.removeLayer(polyLine);
+		 polyLine = null;
 	}
 }
 
@@ -298,188 +311,191 @@ function findClosestBeaconAsCurrentPoint(received_beacons){
 
 // case: directed_graph
 function test1(){
+	var showMyPointOnly = 1;
 	var isDirectedGraph = 1;
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -55},{"bid": 2, "rssi": -62},{"bid": 4, "rssi": -75},{"bid": 5, "rssi": -80}]';
-		updateMarker(isDirectedGraph, 'p1', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p1', test_data);
 	}, 0);
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -55},{"bid": 2, "rssi": -62},{"bid": 4, "rssi": -75},{"bid": 5, "rssi": -80}]';
-		updateMarker(isDirectedGraph, 'p1', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p1', test_data);
 	}, 150);
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -55},{"bid": 2, "rssi": -62},{"bid": 4, "rssi": -75},{"bid": 5, "rssi": -80}]';
-		updateMarker(isDirectedGraph, 'p1', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p1', test_data);
 	}, 300);
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -55},{"bid": 2, "rssi": -62},{"bid": 4, "rssi": -75},{"bid": 5, "rssi": -80}]';
-		updateMarker(isDirectedGraph, 'p1', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p1', test_data);
 	}, 350);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 2, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 450);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 200, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 500);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 20, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 600);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -55},{"bid": 2, "rssi": -59},{"bid": 4, "rssi": -62},{"bid": 5, "rssi": -80}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1000);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -62},{"bid": 2, "rssi": -59},{"bid": 4, "rssi": -55},{"bid": 5, "rssi": -62}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1500);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -62},{"bid": 2, "rssi": -59},{"bid": 4, "rssi": -65},{"bid": 5, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 2000);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -62},{"bid": 2, "rssi": -59},{"bid": 4, "rssi": -65},{"bid": 5, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 2500);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 1, "rssi": -62},{"bid": 2, "rssi": -59},{"bid": 4, "rssi": -65},{"bid": 5, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3000);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 22, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3100);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 11, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3400);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 9, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3800);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 4100);
 
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -55}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 4200);
 }
 
 // Test case: undirected_graph
 function test2(){
+	var showMyPointOnly = 0;
 	var isDirectedGraph = 0;
+
 	setTimeout(function(){
 		var test_data = '[{"bid": 22, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 0);
 	setTimeout(function(){
 		var test_data = '[{"bid": 22, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 50);
 	setTimeout(function(){
 		var test_data = '[{"bid": 22, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 100);
 	setTimeout(function(){
 		var test_data = '[{"bid": 21, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 300);
 	setTimeout(function(){
 		var test_data = '[{"bid": 21, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 500);
 	setTimeout(function(){
 		var test_data = '[{"bid": 21, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 700);
 	setTimeout(function(){
 		var test_data = '[{"bid": 19, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1000);
 	setTimeout(function(){
 		var test_data = '[{"bid": 19, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1200);
 	setTimeout(function(){
 		var test_data = '[{"bid": 18, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1500);
 	setTimeout(function(){
 		var test_data = '[{"bid": 17, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 1800);
 	setTimeout(function(){
 		var test_data = '[{"bid": 6, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 2100);
 	setTimeout(function(){
 		var test_data = '[{"bid": 7, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 2400);
 	setTimeout(function(){
 		var test_data = '[{"bid": 16, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 2700);
 	setTimeout(function(){
 		var test_data = '[{"bid": 15, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3900);
 	setTimeout(function(){
 		var test_data = '[{"bid": 14, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3300);
 	setTimeout(function(){
 		var test_data = '[{"bid": 13, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3600);
 	setTimeout(function(){
 		var test_data = '[{"bid": 12, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 3900);
 	setTimeout(function(){
 		var test_data = '[{"bid": 11, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 4100);
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 4400);
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 4700);
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 5000);
 	setTimeout(function(){
 		var test_data = '[{"bid": 13, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 5300);
 	setTimeout(function(){
 		var test_data = '[{"bid": 11, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 5700);
 	setTimeout(function(){
 		var test_data = '[{"bid": 55, "rssi": -59}]';
-		updateMarker(isDirectedGraph, 'p55', test_data);
+		updateMarker(showMyPointOnly, isDirectedGraph, 'p55', test_data);
 	}, 6100);
 }

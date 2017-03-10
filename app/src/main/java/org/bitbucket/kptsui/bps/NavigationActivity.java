@@ -7,6 +7,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -49,17 +51,9 @@ public class NavigationActivity extends AppCompatActivity {
 
     private Handler mHandler;
 
-    public final static int PAYPAL_REQUEST_CODE = 999;
-    // Test pay 10 dollars
-    public final static int HOURLY_RATE = 40;
-    // payment to this account
-    public final static String paypal_client_id = "ASnyoDP9KsZ8yVdYCrRaSddOpMQ1utYPHE0GvbkdnD50eAihws3yspNgaMsuhDdw4P5rlsaduNodNszN";
-
-    PayPalConfiguration paypal_config;
-    Intent service;
-
     private WebView webView;
     private int isDirectedGraph;
+    private int showMyPointOnly;
     private String parkingLotId = "p55";
 
     @Override
@@ -73,18 +67,8 @@ public class NavigationActivity extends AppCompatActivity {
         //mWebView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);
         webView.loadUrl("file:///android_asset/index.html");
 
-        // TODO:
         parkingLotId = getIntent().getStringExtra("parkingLotId");
         isDirectedGraph = getIntent().getIntExtra("isDirectedGraph", 0);
-
-        // Sandbox for test, Production for real
-        paypal_config = new PayPalConfiguration()
-                .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
-                .clientId(paypal_client_id);
-
-        service = new Intent(this, PayPalService.class);
-        service.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, paypal_config);
-        startService(service); // listening
 
         mHandler = new Handler();
 
@@ -108,6 +92,19 @@ public class NavigationActivity extends AppCompatActivity {
                 try {
                     if(beacons == null || beacons.size() == 0){
                         Log.d(App.TAG, "no Beacons found");
+                        /* Test */
+                        final String invoke =
+                                "javascript:updateMarker(" + showMyPointOnly +
+                                        "," + isDirectedGraph + ",'p55','"
+                                        + "[{\"bid\": 22, \"rssi\": -55}]" + "');";
+                        Log.d(App.TAG, invoke);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                webView.loadUrl(invoke);
+                            }
+                        });
+
                         return;
                     }
 
@@ -123,8 +120,9 @@ public class NavigationActivity extends AppCompatActivity {
                     }
 
                     final String invoke =
-                            "javascript:updateMarker(" + isDirectedGraph + ",'p55','"
-                            + jsonArray.toString() + "');";
+                            "javascript:updateMarker(" + showMyPointOnly +
+                                    "," + isDirectedGraph +
+                                    ",'p55','" + jsonArray.toString() + "');";
 
                     Log.d(App.TAG, invoke);
 
@@ -141,6 +139,38 @@ public class NavigationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.navigation, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar will automatically handle clicks on the Home/Up button,
+        // so long as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()){
+            case R.id.navigation:
+                isDirectedGraph = 1;
+                return true;
+
+            case R.id.walk:
+                isDirectedGraph = 0;
+                return true;
+
+            case R.id.showPositionOnly:
+                if(showMyPointOnly == 0)
+                    showMyPointOnly = 1;
+                else
+                    showMyPointOnly = 0;
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -183,62 +213,4 @@ public class NavigationActivity extends AppCompatActivity {
         // TODO: invoke server API to get paymentAmount, then invoke pay(paymentAmount)
     }
 
-    private void pay(){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
-
-        query.whereEqualTo("status", "checkedOut");
-        query.whereEqualTo("user", ParseUser.getCurrentUser().getObjectId());
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    Log.d(App.TAG, "Fetched object: " + object);
-                    if(object != null){ // user parked before
-                        Date checkIn = object.getDate("checkinTime");
-                        Date checkOut = object.getDate("checkoutTime");
-                        long parkedHours = (checkOut.getTime() - checkIn.getTime()) / (60*60*1000);
-
-                        PayPalPayment payment = new PayPalPayment(new BigDecimal(parkedHours * HOURLY_RATE), "HKD", "Car Park Payment",
-                                PayPalPayment.PAYMENT_INTENT_SALE);
-                        // go to PaymentActivity
-                        Intent intent = new Intent(NavigationActivity.this, PaymentActivity.class);
-                        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, paypal_config);
-                        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
-
-                        startActivityForResult(intent, PAYPAL_REQUEST_CODE);
-                    }
-                } else {
-                    // something went wrong
-                    Log.e(App.TAG, e.toString());
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == PAYPAL_REQUEST_CODE){
-            if(resultCode == Activity.RESULT_OK){
-                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-
-                if(confirm != null){
-                    String state = confirm.getProofOfPayment().getState();
-                    if(state.equals("approved")){
-                        Toast.makeText(this, "Payment is approved", Toast.LENGTH_SHORT).show();
-                        Log.d(App.TAG, "Payment is approved");
-                    }
-                    else {
-                        Toast.makeText(this, "Payment error: " + state, Toast.LENGTH_SHORT).show();
-                        Log.e(App.TAG, "Payment error: " + state);
-                    }
-                }
-                else {
-                    Toast.makeText(this, "Confirmation is null", Toast.LENGTH_SHORT).show();
-                    Log.e(App.TAG, "Confirmation is null");
-                }
-            }
-        }
-    }
 }
