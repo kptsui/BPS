@@ -277,7 +277,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    public void checkout(){
+    // should only be invoked by onActivityResult
+    private void checkout(){
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Checking out");
@@ -320,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         requestQueue.add(request);
     }
 
+    // TODO: invoke this method when user click check-out
     private void pay(){
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
 
