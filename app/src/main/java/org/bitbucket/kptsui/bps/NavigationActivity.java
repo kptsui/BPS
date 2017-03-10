@@ -92,7 +92,7 @@ public class NavigationActivity extends AppCompatActivity {
                 try {
                     if(beacons == null || beacons.size() == 0){
                         Log.d(App.TAG, "no Beacons found");
-                        /* Test */
+                        /* Test
                         final String invoke =
                                 "javascript:updateMarker(" + showMyPointOnly +
                                         "," + isDirectedGraph + ",'p55','"
@@ -104,7 +104,7 @@ public class NavigationActivity extends AppCompatActivity {
                                 webView.loadUrl(invoke);
                             }
                         });
-
+                        */
                         return;
                     }
 
