@@ -22,14 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-
+            android:layout_weight="1"
             android:gravity="right">
 
             <TextView
@@ -50,13 +50,19 @@
                 android:textSize="18sp"
                 android:text="Email: "/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Parking Lot: "/>
+
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-
+            android:layout_weight="1"
             android:gravity="left">
 
             <TextView
@@ -80,14 +86,31 @@
                 android:textSize="18sp"
                 android:text="-----"/>
 
+            <TextView
+                android:id="@+id/parkingLot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="-----"/>
+
         </LinearLayout>
 
     </LinearLayout>
 
     <Button
+        android:text="Checkout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="btnCheckoutClicked"
+        android:textAllCaps="false"
+        android:id="@+id/btnCheckout" />
+
+    <Button
         android:text="Logout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:onClick="btnLogoutClicked"
         android:textAllCaps="false"
         android:id="@+id/btnLogout" />
