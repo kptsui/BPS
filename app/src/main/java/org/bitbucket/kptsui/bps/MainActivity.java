@@ -252,13 +252,13 @@ public class MainActivity extends AppCompatActivity {
 
                         ParseCloud.callFunctionInBackground("checkin", map, new FunctionCallback<ParseObject>() {
                             @Override
-                            public void done(ParseObject ParkingRecord, ParseException e) {
+                            public void done(ParseObject parkingSpace, ParseException e) {
                                 progressDialog.dismiss();
 
                                 if (e == null) {
                                     try {
-                                        Log.d(App.TAG, ParkingRecord.getClassName());
-                                        String parkingLotId = ParkingRecord.getParseObject("parkingSpace").getString("parkingLotId");
+                                        Log.d(App.TAG, parkingSpace.getClassName());
+                                        String parkingLotId = parkingSpace.getString("parkingLotId");
                                         Log.d(App.TAG, parkingLotId);
                                         Toast.makeText(App.getInstance(), "Check-in succeeded\nYour Car Lot is: " + parkingLotId, Toast.LENGTH_SHORT).show();
 
