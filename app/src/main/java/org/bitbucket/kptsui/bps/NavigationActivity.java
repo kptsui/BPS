@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.sdk.Beacon;
@@ -69,6 +70,9 @@ public class NavigationActivity extends AppCompatActivity {
 
         parkingLotId = getIntent().getStringExtra("parkingLotId");
         isDirectedGraph = getIntent().getIntExtra("isDirectedGraph", 0);
+
+        TextView userParkingLot = (TextView) findViewById(R.id.userParkingLot);
+        userParkingLot.setText(parkingLotId);
 
         mHandler = new Handler();
 

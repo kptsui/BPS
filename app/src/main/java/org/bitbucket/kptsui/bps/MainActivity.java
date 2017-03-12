@@ -1,25 +1,23 @@
 package org.bitbucket.kptsui.bps;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
@@ -28,24 +26,13 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.paypal.android.sdk.payments.PayPalConfiguration;
-import com.paypal.android.sdk.payments.PayPalPayment;
-import com.paypal.android.sdk.payments.PayPalService;
-import com.paypal.android.sdk.payments.PaymentActivity;
-import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     public final static String CAR_PARK_ID = "f1tMOZIDmZ";
 
@@ -100,17 +87,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
 
         // create menu items;
-        itemProfile  = new ResideMenuItem(this, R.drawable.ic_account,  "Profile");
-        itemRecord  = new ResideMenuItem(this, R.drawable.ic_history,  "Record");
-        itemSettings = new ResideMenuItem(this, R.drawable.ic_settings, "Settings");
+        itemProfile  = new ResideMenuItem(this, R.drawable.ic_profile,  "My Account");
+        itemRecord  = new ResideMenuItem(this, R.drawable.ic_calendar,  "Parking Record");
+        itemSettings = new ResideMenuItem(this, R.drawable.ic_settings, "Share Space");
 
         resideMenu.addMenuItem(itemProfile, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemRecord, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemSettings, ResideMenu.DIRECTION_LEFT);
 
-        itemProfile.setOnClickListener(this);
-        itemRecord.setOnClickListener(this);
-        itemSettings.setOnClickListener(this);
+        itemProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(ParseUser.getCurrentUser() != null)
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+
+                resideMenu.closeMenu();
+            }
+        });
+        itemRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resideMenu.closeMenu();
+            }
+        });
+        itemSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resideMenu.closeMenu();
+            }
+        });
     }
 
     @Override
@@ -128,24 +133,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View view) {
-
-        if (view == itemProfile){
-            if(ParseUser.getCurrentUser() != null)
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-
-        }
-        else if (view == itemRecord){
-
-        }
-        else if (view == itemSettings){
-
-        }
-
-        resideMenu.closeMenu();
     }
 
     private void updateParkingSpaces(){
@@ -206,38 +193,94 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void parkMyCar(View v){
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setTitle("Getting Car Lot");
-        progressDialog.setMessage("Please Wait...");
-        progressDialog.show();
-
-        ParseCloud.callFunctionInBackground("checkin", new HashMap<String, Object>(), new FunctionCallback<ParseObject>() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_park_time_select, null);
+        final Switch mSwitch = (Switch) view.findViewById(R.id.switchSpecifyParkingTime);
+        final NumberPicker mNumberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
+        mNumberPicker.setVisibility(View.GONE);
+        mNumberPicker.setFormatter(new NumberPicker.Formatter() {
             @Override
-            public void done(ParseObject ParkingRecord, ParseException e) {
-                progressDialog.dismiss();
-
-                if (e == null) {
-                    try {
-                        String parkingLotId = ParkingRecord.getParseObject("parkingSpace").getString("parkingLotId");
-                        Log.d(App.TAG, parkingLotId);
-                        Toast.makeText(App.getInstance(), "Check-in succeeded\nYour Car Lot is: " + parkingLotId, Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
-                        intent.putExtra("parkingLotId", parkingLotId);
-                        intent.putExtra("isDirectedGraph", 1);
-                        startActivity(intent);
-
-                    } catch (Exception ex){
-                        Log.e(App.TAG, ex.toString());
-                        Toast.makeText(App.getInstance(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.e(App.TAG, e.toString());
-                    Toast.makeText(App.getInstance(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+            public String format(int i) {
+                if(i < 2)
+                    return i + " hour";
+                else
+                    return i + " hours";
             }
         });
+        mNumberPicker.setMaxValue(24);
+        mNumberPicker.setMinValue(1);
+        mNumberPicker.setValue(1);
+        mNumberPicker.setWrapSelectorWheel(false);
+        // disable click to input value manually
+        //mNumberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    mNumberPicker.setValue(mNumberPicker.getMinValue());
+                    mNumberPicker.setVisibility(View.VISIBLE);
+                }
+                else {
+                    mNumberPicker.setVisibility(View.GONE);
+                }
+
+                Log.d(App.TAG, "mNumberPicker.setEnabled(isChecked): " + isChecked);
+            }
+        });
+
+        dialog.setView(view)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                        progressDialog.setCancelable(false);
+                        progressDialog.setTitle("Getting Car Lot");
+                        progressDialog.setMessage("Please Wait...");
+                        progressDialog.show();
+
+                        Log.d(App.TAG, "mSwitch.isChecked(): "+mSwitch.isChecked()+", mNumberPicker.getValue(): " + mNumberPicker.getValue());
+
+                        Map<String, Integer> map = new HashMap<>();
+
+                        if(mSwitch.isChecked()){
+                            int selectedTime = mNumberPicker.getValue();
+                            if(selectedTime > 0){
+                                map.put("time", selectedTime);
+                            }
+                        }
+
+                        ParseCloud.callFunctionInBackground("checkin", map, new FunctionCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject ParkingRecord, ParseException e) {
+                                progressDialog.dismiss();
+
+                                if (e == null) {
+                                    try {
+                                        Log.d(App.TAG, ParkingRecord.getClassName());
+                                        String parkingLotId = ParkingRecord.getParseObject("parkingSpace").getString("parkingLotId");
+                                        Log.d(App.TAG, parkingLotId);
+                                        Toast.makeText(App.getInstance(), "Check-in succeeded\nYour Car Lot is: " + parkingLotId, Toast.LENGTH_SHORT).show();
+
+                                        Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+                                        intent.putExtra("parkingLotId", parkingLotId);
+                                        intent.putExtra("isDirectedGraph", 1);
+                                        startActivity(intent);
+
+                                    } catch (Exception ex){
+                                        Log.e(App.TAG, ex.toString());
+                                        Toast.makeText(App.getInstance(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Log.e(App.TAG, e.toString());
+                                    Toast.makeText(App.getInstance(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+        dialog.show();
 
         /*
         OkHttpClient client = new OkHttpClient();

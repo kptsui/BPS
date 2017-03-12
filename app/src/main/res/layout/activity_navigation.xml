@@ -23,17 +23,38 @@
             android:hint="end"/>
     </LinearLayout-->
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:textSize="20sp"
+        android:text="Your Parking Space"
+        android:textColor="#BFFFFFFF"
+        android:gravity="center"
+        android:id="@+id/textView"
+        android:background="@color/background_material_dark" />
+
+    <TextView
+        android:id="@+id/userParkingLot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:paddingBottom="5dp"
+        android:text="----"
+        android:gravity="center"
+        android:background="@color/background_material_dark" />
+
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@android:color/darker_gray"
-        style="@android:style/Widget.WebView"></WebView>
+        style="@android:style/Widget.WebView" />
 
     <Button
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:text="Arrived"
         android:textAllCaps="false"
         android:textSize="28sp"

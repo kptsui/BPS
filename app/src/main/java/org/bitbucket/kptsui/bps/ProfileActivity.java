@@ -130,7 +130,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void btnCheckoutClicked(View v){
-        pay();
+        // TODO: invoke pay() only after testing
+        //pay();
+        checkout();
     }
 
     private void pay(){
