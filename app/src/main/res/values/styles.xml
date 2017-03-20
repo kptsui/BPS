@@ -18,7 +18,7 @@
     <style name="ProfileActivityTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#175a73</item>
-        <item name="colorPrimaryDark">#000</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 

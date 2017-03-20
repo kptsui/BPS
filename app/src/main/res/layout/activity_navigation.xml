@@ -26,7 +26,7 @@
             android:textColor="#BFFFFFFF"
             android:textSize="22sp"
 
-            android:shadowColor="#18FFFF"
+            android:shadowColor="#fff"
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="6"/>
@@ -44,7 +44,7 @@
             android:shadowColor="#18FFFF"
             android:shadowDx="1"
             android:shadowDy="1"
-            android:shadowRadius="12"/>
+            android:shadowRadius="8"/>
 
     </LinearLayout>
 
