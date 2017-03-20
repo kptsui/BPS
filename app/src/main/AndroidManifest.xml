@@ -48,6 +48,7 @@
 
         <activity
             android:name=".ProfileActivity"
+            android:theme="@style/ProfileActivityTheme"
             android:screenOrientation="portrait"
             android:label="Profile"
             android:parentActivityName=".MainActivity">

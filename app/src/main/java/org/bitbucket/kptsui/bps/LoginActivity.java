@@ -17,20 +17,21 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import info.hoang8f.android.segmented.SegmentedGroup;
+import info.hoang8f.widget.FButton;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText loginName;
     EditText loginPw;
     RadioButton rbtnLogin;
-    Button btnLoginSend;
+    FButton btnLoginSend;
 
     EditText signUpEmail;
     EditText signUpName;
     EditText signUpPw;
     EditText signUpPw2;
     RadioButton rbtnSignUp;
-    Button btnSignUpSend;
+    FButton btnSignUpSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +43,13 @@ public class LoginActivity extends AppCompatActivity {
 
         loginName = (EditText) findViewById(R.id.loginName);
         loginPw = (EditText) findViewById(R.id.loginPw);
-        btnLoginSend = (Button) findViewById(R.id.btnLoginSend);
+        btnLoginSend = (FButton) findViewById(R.id.btnLoginSend);
 
         signUpEmail = (EditText) findViewById(R.id.signUpEmail);
         signUpName = (EditText) findViewById(R.id.signUpName);
         signUpPw = (EditText) findViewById(R.id.signUpPw);
         signUpPw2 = (EditText) findViewById(R.id.signUpPw2);
-        btnSignUpSend = (Button) findViewById(R.id.btnSignUpSend);
+        btnSignUpSend = (FButton) findViewById(R.id.btnSignUpSend);
 
         rbtnLogin = (RadioButton) findViewById(R.id.rbtnLogin);
         rbtnLogin.setOnClickListener(new View.OnClickListener() {

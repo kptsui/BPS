@@ -5,7 +5,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
+    android:background="@drawable/background_main"
     tools:context="org.bitbucket.kptsui.bps.MainActivity">
 
     <LinearLayout
@@ -25,34 +25,41 @@
 
             <TextView
                 android:id="@+id/carParkName"
-                android:text="Car Park"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:textSize="22sp"
-                android:textColor="#BFFFFFFF" />
+                android:paddingTop="8dp"
+                android:text="Car Park"
+                android:textColor="#B4FFFFFF"
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/carParkAddress"
-                android:text="HKUST Clear Water Bay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elegantTextHeight="false"
                 android:gravity="center"
-                android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:textSize="30sp"/>
+                android:paddingTop="8dp"
+
+                android:shadowColor="#18FFFF"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="12"
+
+                android:text="HKUST Clear Water Bay"
+                android:textSize="30sp" />
 
             <TextView
-                android:text="Available Parking Spaces"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:textSize="22sp"
-                android:textColor="#BFFFFFFF" />
+                android:paddingTop="8dp"
+                android:text="Available Parking Spaces"
+                android:textColor="#B4FFFFFF"
+                android:textSize="22sp" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -67,20 +74,35 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/availableSpaces"
-                    android:textSize="32sp"/>
+                    android:textSize="32sp"
+
+                    android:shadowColor="#18FFFF"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="12"/>
 
                 <TextView
                     android:text=" / "
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="32sp"/>
+                    android:textSize="32sp"
+
+                    android:shadowColor="#18FFFF"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="12"/>
 
                 <TextView
                     android:text="0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/totalSpaces"
-                    android:textSize="32sp"/>
+                    android:textSize="32sp"
+
+                    android:shadowColor="#18FFFF"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="12"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -92,26 +114,38 @@
             android:gravity="bottom">
 
             <Button
-                android:text="Find My Car"
                 android:id="@+id/btnFindMyCar"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/find_my_car"
+                android:text="Find My Car"
+                android:textSize="22sp"
+                android:background="@drawable/background_rectangle_clickable"
+                android:drawableTop="@drawable/find_my_car_fluoresent"
                 android:textAllCaps="false"
                 android:onClick="findMyCar"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+
+                android:shadowColor="#18FFFF"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="12"/>
 
             <Button
+                android:id="@+id/btnParkMyCar"
                 android:text="Park My Car"
-                android:background="@android:color/transparent"
+                android:textSize="22sp"
+                android:background="@drawable/background_rectangle_clickable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/btnParkMyCar"
-                android:drawableTop="@drawable/get_car_lot"
+                android:drawableTop="@drawable/get_my_car_fluoresent"
                 android:textAllCaps="false"
                 android:onClick="parkMyCar"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+
+                android:shadowColor="#18FFFF"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="12"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -3,6 +3,7 @@ package org.bitbucket.kptsui.bps;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView userId, userName, userEmail, parkingLot;
+    private TextView userName, userEmail, avgHours, parkedHours, parkingLot, timer, checkinTime;
 
     private int hourlyRate = 0;
 
@@ -47,13 +48,21 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        userId = (TextView) findViewById(R.id.userId);
+        getSupportActionBar().setElevation(0);
+        getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.profile_header_background));
+
         userName = (TextView) findViewById(R.id.userName);
         userEmail = (TextView) findViewById(R.id.userEmail);
+
+        avgHours = (TextView) findViewById(R.id.avgHours);
+        parkedHours = (TextView) findViewById(R.id.parkedHours);
+
         parkingLot = (TextView) findViewById(R.id.parkingLot);
+        timer = (TextView) findViewById(R.id.timer);
+        checkinTime = (TextView) findViewById(R.id.checkinTime);
 
         ParseUser user = ParseUser.getCurrentUser();
-        userId.setText(user.getObjectId());
+
         userName.setText(user.getUsername());
         userEmail.setText(user.getEmail());
 
@@ -97,7 +106,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         String parkingLotId = object.getString("parkingLotId");
                                         String status = object.getString("status");
 
-                                        parkingLot.setText(parkingLotId + " (" + status + ")");
+                                        parkingLot.setText(parkingLotId);
                                     }
                                 } else {
                                     // something went wrong

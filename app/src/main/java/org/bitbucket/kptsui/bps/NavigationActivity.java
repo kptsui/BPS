@@ -61,8 +61,11 @@ public class NavigationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        getSupportActionBar().setElevation(0);
 
         webView = (WebView) findViewById(R.id.webView);
+        // background color must be set in code in order to prevent white loading screen
+        webView.setBackgroundColor(getResources().getColor(R.color.backgroundFloorPlanPurpleBlue));
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         //mWebView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
@@ -9,7 +11,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    android:background="@drawable/background"
+    android:background="@drawable/background_purple_blue_light_to_dark"
     tools:context="org.bitbucket.kptsui.bps.LoginActivity">
 
     <ScrollView
@@ -111,49 +113,50 @@
 
     </ScrollView>
 
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/segmentedButtonGroup"
-        android:id="@+id/linearLayout">
-
-
-
-    </LinearLayout>
-
-    <Button
+    <!--Button
         android:text="Login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnLoginSend"
         android:onClick="btnLoginSend"
-        android:textAllCaps="false"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:textAllCaps="false" /-->
 
-    <Button
+    <info.hoang8f.widget.FButton
+        android:id="@+id/btnLoginSend"
+        android:onClick="btnLoginSend"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        fbutton:buttonColor="@color/colorAccent"
+        fbutton:shadowColor="@color/colorAccentDark"
+        fbutton:shadowEnabled="true"
+        fbutton:shadowHeight="5dp"
+        fbutton:cornerRadius="5dp"
+    />
+
+    <!--Button
         android:text="Sign Up"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnSignUpSend"
         android:onClick="btnSignUpSend"
         android:textAllCaps="false"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:visibility="gone"/>
+        android:visibility="gone"/-->
 
-    <LinearLayout
-        android:id="@+id/segmentedButtonGroup"
-        android:gravity="center"
-        android:orientation="horizontal"
+    <info.hoang8f.widget.FButton
+        android:id="@+id/btnSignUpSend"
+        android:onClick="btnSignUpSend"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
-
-
-    </LinearLayout>
+        android:text="Sign Up"
+        fbutton:buttonColor="@color/colorAccent"
+        fbutton:shadowColor="@color/colorAccentDark"
+        fbutton:shadowEnabled="true"
+        fbutton:shadowHeight="5dp"
+        fbutton:cornerRadius="5dp"
+        android:visibility="gone"
+        />
 
 </LinearLayout>
