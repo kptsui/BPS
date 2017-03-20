@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.estimote.sdk.repackaged.gson_v2_3_1.com.google.gson.Gson;
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
@@ -29,7 +31,13 @@ import com.parse.ParseUser;
 import com.special.ResideMenu.ResideMenu;
 import com.special.ResideMenu.ResideMenuItem;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static int getHourlyRate() {
         return hourlyRate;
+    }
+
+    public class Schedule implements Serializable {
+        public int weekday;
+        public int startTime;
+        public int duration;
+        public String parkingLotId;
     }
 
     @Override
@@ -85,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         resideMenu.attachToActivity(this);
 
         //resideMenu.setScaleValue(0.5f);
-        //resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
+        resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
 
         // create menu items;
         itemProfile  = new ResideMenuItem(this, R.drawable.ic_profile,  "Profile");
@@ -110,12 +125,56 @@ public class MainActivity extends AppCompatActivity {
         itemRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(ParseUser.getCurrentUser() != null)
+                    startActivity(new Intent(MainActivity.this, RecordActivity.class));
                 resideMenu.closeMenu();
             }
         });
         itemShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(ParseUser.getCurrentUser() != null){
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpace");
+                    query.whereExists("schedule");
+                    query.whereEqualTo("owner", ParseUser.getCurrentUser());
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            if (e == null) {
+                                try {
+                                    Log.d(App.TAG, "Fetched object: " + objects);
+
+                                    ArrayList<String> schedules = new ArrayList<String>();
+
+                                    for(ParseObject object : objects){
+                                        JSONArray array = object.getJSONArray("schedule");
+                                        Log.e(App.TAG, array.toString());
+
+                                        for(int i = 0; i < array.length(); ++i){
+                                            JSONObject json = array.getJSONObject(i);
+                                            Schedule schedule = new Schedule();
+                                            schedule.weekday = json.getInt("weekday");
+                                            schedule.startTime = json.getInt("startTime");
+                                            schedule.duration = json.getInt("duration");
+                                            schedule.parkingLotId = object.getString("parkingLotId");
+
+                                            schedules.add(new Gson().toJson(schedule));
+                                        }
+                                    }
+
+                                    Intent intent = new Intent(MainActivity.this, SpaceShareActivity.class);
+                                    intent.putStringArrayListExtra("schedules", schedules);
+                                    startActivity(intent);
+
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            } else {
+                                // something went wrong
+                                Log.e(App.TAG, e.toString());
+                            }
+                        }
+                    });
+                }
                 resideMenu.closeMenu();
             }
         });

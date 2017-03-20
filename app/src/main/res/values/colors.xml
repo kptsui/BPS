@@ -10,5 +10,7 @@
 
     <color name="backgroundFloorPlanPurpleBlue">#000e29</color>
 
+    <color name="scheduleGreen">#9a00cc7a</color>
+
     <color name="black_overlay">#232367c6</color>
 </resources>

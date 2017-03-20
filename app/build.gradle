@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "org.bitbucket.kptsui.bps"
         minSdkVersion 18
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -26,11 +26,20 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:design:22.2.1'
-    compile 'com.estimote:sdk:0.13.0@aar'
+    //compile 'com.android.support:appcompat-v7:22.2.1'
+    //compile 'com.android.support:support-v4:22.2.1'
+    //compile 'com.android.support:design:22.2.1'
+
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.android.support:design:25.3.0'
+
+    compile 'com.estimote:sdk:0.16.0@aar'
+
     compile 'com.parse:parse-android:1.13.1'
+
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
+
     compile 'com.specyci:residemenu:1.6+'
     compile 'info.hoang8f:android-segmented:1.0.6'
     compile 'info.hoang8f:fbutton:1.0.5'
