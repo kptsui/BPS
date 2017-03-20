@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private ResideMenu resideMenu;
     private ResideMenuItem itemProfile;
     private ResideMenuItem itemRecord;
+    private ResideMenuItem itemShare;
     private ResideMenuItem itemSettings;
 
     private ActionBar actionBar;
@@ -87,12 +88,14 @@ public class MainActivity extends AppCompatActivity {
         //resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT);
 
         // create menu items;
-        itemProfile  = new ResideMenuItem(this, R.drawable.ic_profile,  "My Account");
-        itemRecord  = new ResideMenuItem(this, R.drawable.ic_calendar,  "Parking Record");
-        itemSettings = new ResideMenuItem(this, R.drawable.ic_settings, "Share Space");
+        itemProfile  = new ResideMenuItem(this, R.drawable.ic_profile,  "Profile");
+        itemRecord  = new ResideMenuItem(this, R.drawable.ic_calendar,  "Record");
+        itemShare = new ResideMenuItem(this, R.drawable.ic_share, "Share");
+        itemSettings = new ResideMenuItem(this, R.drawable.ic_settings, "Settings");
 
         resideMenu.addMenuItem(itemProfile, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemRecord, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(itemShare, ResideMenu.DIRECTION_LEFT);
         resideMenu.addMenuItem(itemSettings, ResideMenu.DIRECTION_LEFT);
 
         itemProfile.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         itemRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resideMenu.closeMenu();
+            }
+        });
+        itemShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 resideMenu.closeMenu();

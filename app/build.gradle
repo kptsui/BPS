@@ -36,7 +36,7 @@ dependencies {
     compile 'info.hoang8f:fbutton:1.0.5'
     compile 'com.paypal.sdk:paypal-android-sdk:2.15.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    testCompile 'junit:junit:4.12'
     compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile project(':AndroidWeekView')
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
 }
