@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -25,12 +27,14 @@ public class RecordActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Record> records;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         records = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -44,35 +48,34 @@ public class RecordActivity extends AppCompatActivity {
         mAdapter = new RecordAdapter(this, records);
         mRecyclerView.setAdapter(mAdapter);
 
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setTitle("Fetching your status");
-        progressDialog.setMessage("Please Wait...");
-        progressDialog.show();
-
-        // Fetch hourlyRate
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
-                Log.d(App.TAG, objects.toString());
-                progressDialog.dismiss();
-
-                if (e == null) {
-                    for(ParseObject object : objects){
-                        Record record = new Record(
-                                object.getParseObject("parkingSpace").getString("parkingLotId"),
-                                object.getString("paymentAmount"),
-                                object.getDate("checkinTime"),
-                                object.getDate("checkoutTime")
-                        );
-                        records.add(record);
+                try {
+                    Log.d(App.TAG, objects.toString());
+                    if (e == null) {
+                        for(ParseObject object : objects){
+                            Record record = null;
+                            record = new Record(
+                                    object.getParseObject("parkingSpace").fetchIfNeeded().getString("parkingLotId"),
+                                    object.getString("paymentAmount"),
+                                    object.getDate("checkinTime"),
+                                    object.getDate("checkoutTime")
+                            );
+                            records.add(record);
+                        }
+                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        // something went wrong
+                        Log.e(App.TAG, e.toString());
                     }
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    // something went wrong
-                    Log.e(App.TAG, e.toString());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                } finally {
+                    progressBar.setVisibility(View.GONE);
                 }
+
             }
         });
     }

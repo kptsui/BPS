@@ -22,7 +22,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:id="@+id/imageView5"
-            android:src="@drawable/carLot_logo" />
+            android:src="@drawable/carlot_logo" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -81,9 +81,4 @@
         android:layout_alignStart="@+id/in_Time"
         android:layout_marginTop="5dp" />
 
-    <TextView
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#e6e6e6"/>
 </RelativeLayout>

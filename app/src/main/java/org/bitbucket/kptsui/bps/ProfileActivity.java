@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
@@ -25,11 +26,17 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ProfileActivity extends AppCompatActivity {
+import static org.bitbucket.kptsui.bps.Record.ONE_HOUR;
+import static org.bitbucket.kptsui.bps.Record.ONE_MINUTE;
+
+public class ProfileActivity extends Activity {
 
     private TextView userName, userEmail, avgHours, parkedHours, parkingLot, timer, checkinTime;
 
@@ -48,8 +55,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        getSupportActionBar().setElevation(0);
-        getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.profile_header_background));
+        //getSupportActionBar().setElevation(0);
+        //getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.profile_header_background));
 
         userName = (TextView) findViewById(R.id.userName);
         userEmail = (TextView) findViewById(R.id.userEmail);
@@ -126,6 +133,92 @@ public class ProfileActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                     Log.e(App.TAG, e.toString());
                 }
+            }
+        });
+
+        query = ParseQuery.getQuery("ParkingSpace");
+        query.whereEqualTo("currentUser", ParseUser.getCurrentUser());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parkingSpace, ParseException e) {
+                progressDialog.dismiss();
+
+                if (e == null && parkingSpace != null) { // user parked before
+                    Log.d(App.TAG, "Fetched object: " + parkingSpace);
+                    String parkingLotId = parkingSpace.getString("parkingLotId");
+                    ProfileActivity.this.parkingLot.setText(parkingLotId);
+
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingRecord");
+                    query.whereEqualTo("user", ParseUser.getCurrentUser());
+                    query.whereEqualTo("parkingSpace", parkingSpace);
+                    query.orderByDescending("checkinTime");
+                    query.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject object, ParseException e) {
+                            if(e == null){
+                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                Date checkinDate = object.getDate("checkinTime");
+
+                                Log.d(App.TAG, "checkin Date: " + Record.sdf.format(checkinDate));
+                                Log.d(App.TAG, "now Date: " + Record.sdf.format(new Date()));
+
+                                if(checkinDate != null) {
+                                    String checkinTime = sdf.format(checkinDate);
+                                    ProfileActivity.this.checkinTime.setText(checkinTime);
+
+                                    long diff = new Date().getTime() - checkinDate.getTime();
+                                    int hours = (int) (diff / ONE_HOUR);
+                                    int minutes = (int) ((diff / ONE_MINUTE) - (hours * 60));
+                                    ProfileActivity.this.timer.setText(
+                                            (hours < 10 ? "0" + hours : hours) +
+                                                    ":" +
+                                                    (minutes < 10 ? "0" + minutes : minutes));
+
+                                    ProfileActivity.this.parkedHours.setText(String.valueOf(hours));
+                                }
+
+
+                            }
+                        }
+                    });
+
+                } else {
+                    // something went wrong
+                    Log.e(App.TAG, e.getMessage());
+                    Toast.makeText(App.getInstance(), "You did not park a car", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        query = ParseQuery.getQuery("ParkingRecord");
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> objects, ParseException e) {
+                float avgHours = 0;
+                try {
+                    int count = 0;
+                    Log.d(App.TAG, objects.toString());
+                    if (e == null) {
+                        for(ParseObject object : objects){
+                            Date checkinDate = object.getDate("checkinTime");
+                            Date checkoutDate = object.getDate("checkoutTime");
+                            long diff = checkoutDate.getTime() - checkinDate.getTime();
+                            float hours = (float) (diff / ONE_HOUR);
+                            avgHours += hours;
+                            count += 1;
+                        }
+                        avgHours = (float) avgHours / count;
+                    } else {
+                        // something went wrong
+                        Log.e(App.TAG, e.toString());
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                } finally {
+                    DecimalFormat formatter = new DecimalFormat("#.#");
+                    ProfileActivity.this.avgHours.setText(formatter.format(avgHours));
+                }
+
             }
         });
     }

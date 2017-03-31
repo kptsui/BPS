@@ -26,6 +26,14 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:textSize="28sp"
+                    android:textColor="#ffffff"
+                    android:text="Profile"/>
+
                 <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/profile_image"
                     android:layout_width="120dp"
@@ -78,7 +86,7 @@
                         android:shadowDx="1"
                         android:shadowDy="1"
                         android:shadowRadius="14"
-                        android:text="7.5"
+                        android:text="---"
 
                         android:textColor="#fff"
                         android:textSize="30sp" />
@@ -112,7 +120,7 @@
                         android:shadowDx="1"
                         android:shadowDy="1"
                         android:shadowRadius="14"
-                        android:text="36"
+                        android:text="---"
 
                         android:textColor="#fff"
                         android:textSize="30sp" />
@@ -204,7 +212,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="A199"
+                        android:text="---"
                         android:textColor="#fff"
                         android:textSize="30sp" />
                 </LinearLayout>
@@ -233,7 +241,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="03:30"
+                        android:text="---"
                         android:textColor="#fff"
                         android:textSize="30sp" />
                 </LinearLayout>
@@ -261,7 +269,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="14:20"
+                        android:text="---"
                         android:textColor="#fff"
                         android:textSize="30sp" />
                 </LinearLayout>
@@ -277,7 +285,8 @@
                 fbutton:buttonColor="#f0ad4e"
                 fbutton:shadowColor="#bc7410"
                 fbutton:shadowEnabled="true"
-                fbutton:shadowHeight="5dp" />
+                fbutton:shadowHeight="5dp"
+                fbutton:cornerRadius="0dp"/>
 
         </LinearLayout>
 

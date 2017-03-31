@@ -45,7 +45,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        Record record = records.get(position);
+        holder.carLotId.setText(record.carLotId);
+        holder.payment.setText("$" + record.payment);
+        holder.parkedTime.setText(record.parkedTime + "hr");
+        holder.checkinTime.setText(record.checkinTime);
+        holder.checkoutTime.setText(record.checkoutTime);
     }
 
     @Override
